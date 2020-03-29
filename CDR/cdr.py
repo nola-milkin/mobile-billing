@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+import os
 import csv
 import math
 
@@ -41,7 +43,9 @@ def tarif(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_
     # iterate on list to sum all of count
     for in_record in in_calls:
         cost_in += in_record[1]
-    cost_in  = 0 if ((cost_in - in_min_free) <= 0) else (cost_in - in_min_free) * in_min_cost # subtitute free ones and then power with cost
+        
+    # subtitute free ones and then power with cost
+    cost_in  = 0 if ((cost_in - in_min_free) <= 0) else (cost_in - in_min_free) * in_min_cost 
     
     for out_record in out_calls:
         cost_out += out_record[1]
@@ -58,6 +62,13 @@ def tarif(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_
 # variant 18 mod 15 = 3
 if __name__ == "__main__":
     print("== Call Detail Record ==")
+    
+    if len(sys.argv) >= 2:
+        CDR_FILE = sys.argv[1]
+
+    if not os.path.exists(CDR_FILE):
+        print("File {} doesn't exist".format(CDR_FILE))
+        sys.exit(-1)
 
     tel_number = "915783624"
     in_min_cost  = 0
