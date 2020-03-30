@@ -31,7 +31,7 @@ def parse_cdr(cdr_file, tel_number):
     return in_calls, out_calls, sms_list
     
 
-def tarif(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_cost, sms_free):
+def tariffing(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_cost, sms_free):
 
     cost_in  = 0
     cost_out = 0
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     print("Tariffing...")
     in_calls, out_calls, sms_list, \
         cost_in, cost_out, cost_sms \
-            = tarif(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_cost, sms_free)
+            = tariffing(tel_number, in_min_cost, in_min_free, out_min_cost, out_min_free, sms_cost, sms_free)
     
     cost_tel = cost_in + cost_out
     
