@@ -1,5 +1,6 @@
 # NetFlow Protocol
 <img src="./images/screenshot.png" alt="" width="300"/>
+<img src="./images/plot.png" alt="" width="300"/>
 
 ```
 .

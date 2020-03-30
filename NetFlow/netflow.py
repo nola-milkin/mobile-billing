@@ -52,7 +52,7 @@ def graph(date_data_list):
         if (max_date == None) or (max_date < cur_datetime):
             max_date = cur_datetime
         
-        cur_traffic = int(record[2])
+        cur_traffic = int(record[2]) / 1000000.0
         traffic_count.append(cur_traffic)
 
         if (max_traffic < cur_traffic):
@@ -60,12 +60,12 @@ def graph(date_data_list):
 
     ax = plt.subplot()
 
-    ax.set_ylabel('Traffic volume (bytes)')
-    ax.set_xlabel('Time')
+    ax.set_ylabel('Traffic volume (Megabytes)')
+    ax.set_xlabel('Time (hours and minutes)')
 
     ax.set_title('Graph of traffic volume per time')
     ax.set_xlim(min_date - timedelta(minutes=5), max_date + timedelta(minutes=5))
-    ax.set_ylim(0, max_traffic + 100)
+    ax.set_ylim(0, max_traffic + 0.05)
 
     formatter = mdates.DateFormatter('%H:%M')
     ax.xaxis.set_major_formatter(formatter)
@@ -98,12 +98,13 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         NETFLOW_FILE = sys.argv[1]
 
-    if not os.path.exists(NETFLOW_FILE):
-        print("File {} doesn't exist".format(NETFLOW_FILE))
-        sys.exit(-1)
-
     if not os.path.exists(NETFLOW_DUMP_FILE):
         print("Creating dump of NetFlow file...")
+
+        if not os.path.exists(NETFLOW_FILE):
+            print("File {} doesn't exist".format(NETFLOW_FILE))
+            sys.exit(-1)
+
         os.system("nfdump -r " + NETFLOW_FILE + " > " + NETFLOW_DUMP_FILE)
         if not os.path.exists(NETFLOW_DUMP_FILE):
             print("File {} doesn't exist".format(NETFLOW_DUMP_FILE))
