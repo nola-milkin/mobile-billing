@@ -13,7 +13,7 @@
 
 ### Run
 Для запуска программы необходим:
-- Python3 с библиотекой matplotlib
+- Python3 с библиотекой `matplotlib`
 ```
 pip3 install matplotlib
 ```

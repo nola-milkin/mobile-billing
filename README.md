@@ -25,3 +25,14 @@
 ```
 
 ## Payment
+<img src="./Payment/images/screenshot.png" alt="" width="300"/>
+<img src="./Payment/images/document.png" alt="" width="300"/>
+
+```
+.
+├── fonts\
+├── images\
+├── payment.py
+├── payment.pdf
+└── reports\
+```
