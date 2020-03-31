@@ -15,7 +15,7 @@ import matplotlib.dates as mdates
 NETFLOW_FILE      = 'nfcapd.202002251200'
 NETFLOW_DUMP_FILE = 'dump.txt' 
 
-RE_DATA = re.compile(r'(\d+-\d+-\d+) (\d+:\d+:\d+\.\d+) (\w+)[ ]+(\w+ \w+)[ ]+((\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}):(\d+)|(.*?\.\d+))[ ]+->[ ]+((\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}):(\d+)|(.*?\.\d+))[ ]+((\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}):(\d+))[ ]+->[ ]+((\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}):(\d+))[ ]+(\d+)[ ]+(\d+)')
+RE_DATA = re.compile(r'(?P<date>\d+-\d+-\d+) (?P<time>\d+:\d+:\d+\.\d+)[ ]+(\w+[ ]+\w+){0,1}(\d+\.\d+){0,1}[ ](\w+)[ ]+(((?P<src_ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)|(?P<src_ip_v6>.*?\.\d+))[ ]+->[ ]+((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)|(.*?\.\d+))[ ]+){1}(((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)|(.*?\.\d+))[ ]+->[ ]+((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)|(.*?\.\d+))[ ]+){0,1}(\d+){0,1}[ ]+(?P<byte>\d+)[ ]+(\d+)')
 
 def parse_dump(dump_file, is_graph=True, is_net=True):
     date_data_list = list()
@@ -26,13 +26,18 @@ def parse_dump(dump_file, is_graph=True, is_net=True):
     else:
         with open(dump_file) as f:
             data = f.read()
-        for match in re.findall(RE_DATA, data):
-            # valid string matches as list of 20 elements
-            if len(match) == 20:
-                if is_graph:
-                    date_data_list.append([match[0], match[1], match[-2]])
-                if is_net:
-                    ip_data_list.append([match[5], match[-2]])
+        for match in re.finditer(RE_DATA, data):
+            date_list = match.group('date', 'time', 'byte')
+            if is_graph and date_list != (None, None, None):
+                date_data_list.append(date_list)
+
+            if is_net and match.group('byte') != None:
+                if match.group('src_ip') != None:
+                    ip_data_list.append(match.group('src_ip', 'byte'))
+                elif match.group('src_ip_v6') != None:
+                    ip_data_list.append(match.group('src_ip_v6', 'byte'))
+                else:
+                    pass
 
     return date_data_list, ip_data_list
 
@@ -74,7 +79,7 @@ def graph(date_data_list):
 
     ax.plot(record_time, traffic_count, "o")
 
-    plt.gcf().set_size_inches(10, 7)
+    # plt.gcf().set_size_inches(10, 7)
     plt.gcf().autofmt_xdate()
     plt.grid(True)
     plt.show()
@@ -109,11 +114,7 @@ if __name__ == "__main__":
 
         with open(NETFLOW_DUMP_FILE, 'w') as f:
             p1 = subprocess.Popen(split("nfdump -r " + NETFLOW_FILE), stdout=f)
-            p1.wait()
-
-        if not os.path.exists(NETFLOW_DUMP_FILE):
-            print("File {} doesn't exist".format(NETFLOW_DUMP_FILE))
-            sys.exit(-1)
+            status = p1.wait()
 
     ip_addr = "192.168.250.27"
     Mb_cost = 1
