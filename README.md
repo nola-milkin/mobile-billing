@@ -1,4 +1,4 @@
-# mobile-billing
+# mobile
 <img src="./NetFlow/images/plot.png" alt="" width="300"/>
 
 ## CDR (Call Detail Record)
